@@ -9,7 +9,7 @@ nobs = 579
 nparameters = 6
 
 npopulation = 10
-per_second = 60     # estimate of number of generations per second
+per_second = 72     # estimate of number of generations per second
 genmax = int(60*per_second)
 
 train_start = int(0)
