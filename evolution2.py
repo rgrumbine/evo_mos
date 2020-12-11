@@ -1,15 +1,41 @@
 from math import *
 import numpy as np
 
+#Reference numbers for metrics
+RMS=0
+MEAN=1
+MAE=2
+MEAN3=3
+MEAN4=4
+LOSSES=5
+VICKIE=6
+
 ######################################################################
 #The score can be any function of the errors. RMSE is used here for demonstration 
 #   purposes, but in truth, it could be anything. 
 # exponential(delta) is fine (and will give very strange results in the 
 #   evolution -- try it)
 #Interface to various scoring methods:
-def score(obs, pred, delta, start, end, tolerance = 0):
-    #return score_loss(obs, pred, delta, start, end, tolerance)
-    return score_mae(delta, start, end, 3.0)
+def score(obs, pred, delta, start, end, tolerance = 0, metric = 0):
+    if (metric == 0 ):
+      return score_rms(delta, start, end, tolerance)
+    elif (metric == 1):
+      return score_mean(delta, start, end, tolerance)
+    elif (metric == 2):
+      return score_mae(delta, start, end, tolerance)
+    elif (metric == 3):
+      return score_mean3(delta, start, end, tolerance)
+    elif (metric == 4):
+      return score_mean4(delta, start, end, tolerance)
+    elif (metric == 5):
+      return score_loss(obs, pred, delta, start, end, tolerance)
+    elif (metric == 6):
+      return score_vickie(delta, start, end, 3.0)
+    else:
+      print("metric passed was ",metric," which is out of range.")
+      print("continuing with RMS")
+      return score_rms(delta, start, end, tolerance)
+
 
 #RMS -- default score
 def score_rms(delta, start, end, tolerance = 0):
