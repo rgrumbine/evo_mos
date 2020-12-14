@@ -1,11 +1,15 @@
-import sys
 from math import *
 import numpy as np
 
+######################################################################
+import sys
+
+from scores import *
 
 ######################################################################
-from scores import *
-######################################################################
+#make a prediction from variables in the matchup x, using constants in the list y
+#n.b. would be desirable to have a general evaluator that takes the 
+#    prediction function as an argument as well
 
 #First prediction method:
 def predict1(x,y):
@@ -34,7 +38,6 @@ class matchup:
     def show(self, fout = sys.stdout):
         for k in range(0,self.length):
             print(k,self.values[k], file = fout)
-        print(self.score, file = fout, flush = True)
     
     #extract the k-th parameter from the values tuple
     def __getitem__(self,k):
@@ -59,14 +62,15 @@ class critter:
         for k in range(0, self.length):
           self.weights[k] = x.weights[k]
           self.sdevs[k]   = x.sdevs[k]
+        #self.show()
 
     #display element by element the weights and sdevs
     def show(self, fout = sys.stdout):
         n =  self.length
+        print("score ","{:.3f}".format(self.score), " ", file = fout, end='')
         for k in range(0,n):
             print("{:.3f}".format(self.weights[k]), " " 
                   "{:.3f}".format(self.sdevs[k]),   " ", file = fout, end='')
-        print("score ","{:.3f}".format(self.score), " ", file = fout, end='/n')
         print(flush = True, file = fout)
             
     #Function to evolve the next generations -- mutation only in this one
@@ -80,8 +84,7 @@ class critter:
     #take a set of matchups and evaluate (ultimately, to score) the predictions 
     #  from predict1 note that we're now applying a start and end time 
     #  -- the training period
-    def skill(self, matchups, start, end, metric = 0, tolerance = 0.):
-        #print("hello from skill, metric, tolerance = ",metric, tolerance, flush=True)
+    def skill(self, matchups, start, end, metric = 1, tolerance = 0.):
         ndelta = (end-start+1)
         deltas = np.zeros(ndelta)
         pred   = np.zeros(ndelta)
