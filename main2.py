@@ -9,14 +9,16 @@ nobs = 579
 nparameters = 6
 
 npopulation = 10
-per_second = 72     # estimate of number of generations per second
+per_second  = 72     # estimate of number of generations per second 
+                     # WCOSS ~108, Xeon E5 3.7 GHz ~72 (macOS), ...
+          
 genmax = int(60*per_second)
 
 train_start = int(0)
 train_end   = int(364)
 np.random.seed(0)    # for reproducibility
 
-from evolution1 import *
+from evolution2 import *
 
 ######################## ######################## ########################
 # Now bring in the data for real work:
@@ -108,7 +110,7 @@ for k in range (0,npopulation):
 
 #Start accumulating our best critters
 bests.append(critter(nparameters))
-bests[nbests].init(population[kbest].weights, population[kbest].sdevs)
+bests[nbests].init(population[kbest].weights, population[kbest].sdevs, population[kbest].score)
 nbests += 1
 
 population[kbest].show()
@@ -138,7 +140,7 @@ for gen in range(0,genmax):
             kbest = k
             smin = population[k].score
             bests.append(critter(nparameters))
-            bests[nbests].init(population[kbest].weights, population[kbest].sdevs)
+            bests[nbests].init(population[kbest].weights, population[kbest].sdevs, population[kbest].score)
             nbests += 1
     if (kbest != 0):
         if (score_gfs != 0):

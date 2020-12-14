@@ -1,62 +1,11 @@
+import sys
 from math import *
 import numpy as np
 
+
 ######################################################################
-#The score can be any function of the errors. RMSE is used here for demonstration 
-#   purposes, but in truth, it could be anything. 
-# exponential(delta) is fine (and will give very strange results in the 
-#   evolution -- try it)
-#Interface to various scoring methods:
-def score(obs, pred, delta, start, end, tolerance = 0):
-    #return score_loss(obs, pred, delta, start, end, tolerance)
-    return score_mae(delta, start, end, 3.0)
-
-#RMS -- default score
-def score_rms(delta, start, end, tolerance = 0):
-    tmp = delta[start:end]
-    tmp *= tmp
-    return sqrt(sum(tmp)/(end-start))
-
-#Mean
-def score_mean(delta, start, end, tolerance = 0):
-    tmp = delta[start:end]
-    return abs(sum(tmp)/(end-start))
-
-#Mean absolute error
-def score_mae(delta, start, end, tolerance = 0):
-    tmp = abs(delta[start:end])
-    count = len(tmp)
-    if (tolerance != 0.0):
-      count = 0
-      for k in range(0, end-start):
-        if (tmp[k] < tolerance):
-          tmp[k] = 0.0
-        else:
-          count += 1
-    return (sum(tmp)/count)
-
-#Mean3
-def score_mean3(delta, start, end, tolerance = 0):
-    tmp = delta[start:end]
-    return pow(abs(sum(tmp*tmp*tmp)/(end-start)),1./3.)
-
-#Mean4
-def score_mean4(delta, start, end, tolerance = 0):
-    tmp = delta[start:end]
-    return pow(abs(sum(tmp*tmp*tmp*tmp)/(end-start)),1./4.)
-
-#Number of losses -- fewer is better
-def score_loss(obs, pred, delta, start, end, tolerance):
-    count = 0
-    for k in range (start, end):
-       if (abs(delta[k]) > abs(obs[k]) ):
-         count += 1
-    return count
-    
-
-#make a prediction from variables in the matchup x, using constants in the list y
-#n.b. would be desirable to have a general evaluator that takes the 
-#    prediction function as an argument as well
+from scores import *
+######################################################################
 
 #First prediction method:
 def predict1(x,y):
@@ -82,9 +31,10 @@ class matchup:
         self.length = len(values)
     
     #display element by element the values of the matchup
-    def show(self):
+    def show(self, fout = sys.stdout):
         for k in range(0,self.length):
-            print(k,self.values[k])
+            print(k,self.values[k], file = fout)
+        print(self.score, file = fout, flush = True)
     
     #extract the k-th parameter from the values tuple
     def __getitem__(self,k):
@@ -100,23 +50,26 @@ class critter:
         self.sdevs = np.zeros((nparm))
         self.length = nparm
     
-    def init(self, weights, sdevs):
+    def init(self, weights, sdevs, score = 99.0):
+        self.score = score
         for k in range(0, self.length):
           self.weights[k] = weights[k]
           self.sdevs[k]   = sdevs[k] 
             
     def copy(self, x):
+        self.score = x.score
         for k in range(0, self.length):
           self.weights[k] = x.weights[k]
           self.sdevs[k]   = x.sdevs[k]
-        #self.show()
 
     #display element by element the weights and sdevs
-    def show(self):
+    def show(self, fout = sys.stdout):
         n =  self.length
         for k in range(0,n):
-        #for k in range(0,1):
-            print(k,self.weights[k], self.sdevs[k])
+            print("{:.3f}".format(self.weights[k]), " " 
+                  "{:.3f}".format(self.sdevs[k]),   " ", file = fout, end='')
+        print("score ","{:.3f}".format(self.score), " ", file = fout, end='\n')
+        print(flush = True, file = fout)
             
     #Function to evolve the next generations -- mutation only in this one
     def evolve(self):
@@ -129,7 +82,8 @@ class critter:
     #take a set of matchups and evaluate (ultimately, to score) the predictions 
     #  from predict1 note that we're now applying a start and end time 
     #  -- the training period
-    def skill(self, matchups, start, end):
+    def skill(self, matchups, start, end, metric = 0, tolerance = 0.):
+        #print("hello from skill, metric, tolerance = ",metric, tolerance, flush=True)
         ndelta = (end-start+1)
         deltas = np.zeros(ndelta)
         pred   = np.zeros(ndelta)
@@ -139,7 +93,7 @@ class critter:
            pred[k-start] = predict1(matchups[k],self.weights)
    
         deltas = obs-pred
-        self.score = score(obs, pred, deltas, 0, ndelta)
+        self.score = score(obs, pred, deltas, 0, ndelta, metric, tolerance)
         return(self.score)
 
     #Show the parameters and the prediction:
