@@ -50,12 +50,14 @@ class critter:
         self.sdevs = np.zeros((nparm))
         self.length = nparm
     
-    def init(self, weights, sdevs):
+    def init(self, weights, sdevs, score = 99.0):
+        self.score = score
         for k in range(0, self.length):
           self.weights[k] = weights[k]
           self.sdevs[k]   = sdevs[k] 
             
     def copy(self, x):
+        self.score = x.score
         for k in range(0, self.length):
           self.weights[k] = x.weights[k]
           self.sdevs[k]   = x.sdevs[k]
@@ -66,7 +68,7 @@ class critter:
         for k in range(0,n):
             print("{:.3f}".format(self.weights[k]), " " 
                   "{:.3f}".format(self.sdevs[k]),   " ", file = fout, end='')
-        print("score ","{:.3f}".format(self.score), " ", file = fout, end='/n')
+        print("score ","{:.3f}".format(self.score), " ", file = fout, end='\n')
         print(flush = True, file = fout)
             
     #Function to evolve the next generations -- mutation only in this one
