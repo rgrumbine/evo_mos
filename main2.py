@@ -61,11 +61,11 @@ for k in range (0,npopulation):
 weights = np.zeros((nparameters))
 sdevs   = np.zeros((nparameters))
 bests.append(critter(nparameters))
-bests[0].init(weights, sdevs)
+bests[0].init(weights, sdevs, 99.)
 nbests = 1
 
 #for reference, take the raw gfs output's score:
-population[0].init(weights, sdevs)
+population[0].init(weights, sdevs, 99.)
 score_gfs = population[0].skill(matchup_set, train_start, train_end) 
 
 print("uncorrected score in training period: ",
@@ -96,7 +96,7 @@ for k in range (0,npopulation):
   weights[0] = np.random.normal(0,sdevs[0])
   for l in range (1, int(6) ):     #initialize only the linear part
     weights[l] = np.random.normal(0,sdevs[l])
-  population[k].init(weights,sdevs)
+  population[k].init(weights,sdevs, 99.)
 
 #recall that the matchup_set is holding the matchups
 #Find our first 'best' -- noting that we aren't saving raw gfs as an example
