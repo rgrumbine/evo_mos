@@ -29,7 +29,7 @@ def score(obs, pred, delta, start, end, metric = 0, tolerance = 0):
     if (metric == RMS):
       return score_rms(delta, start, end, tolerance)
     elif (metric == MEAN):
-      return score_rms(delta, start, end, tolerance)
+      return score_mean(delta, start, end, tolerance)
     elif (metric == MAE):
       return score_mae(delta, start, end, tolerance) 
     elif (metric == RM3):
@@ -37,13 +37,14 @@ def score(obs, pred, delta, start, end, metric = 0, tolerance = 0):
     elif (metric == RM4):
       return score_mean4(delta, start, end, tolerance)
     elif (metric == NLOSS):
-      return score_loss(delta, start, end, tolerance)
+      print("metric nloss not currently working, continuing with RMS", flush=True)
+      return score_rms(delta, start, end)
+      #return score_loss(delta, start, end, tolerance)
     elif (metric == VICKIE):
       return score_mae(delta, start, end, 3.0)
     else:
-      print("unknown metric ",metric, " continuing with RMS")
+      print("unknown metric ",metric, " continuing with RMS", flush=True)
       return score_rms(delta, start, end)
-    #return score_loss(obs, pred, delta, start, end, tolerance)
 
 #RMS -- default score
 def score_rms(delta, start, end, tolerance = 0):
